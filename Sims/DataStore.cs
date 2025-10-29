@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -8,24 +9,22 @@ namespace MyFirstWpfApp
     public static class DataStore
     {
         private static readonly string SongsFilePath = "songs.csv";
-        private static readonly string PlaylistFilePath = "user_playlist.csv";
+        private static readonly string UserPlaylistsFilePath = "user_playlists.csv";
 
         public static ObservableCollection<Song> Songs { get; set; } = new ObservableCollection<Song>();
 
         static DataStore()
         {
             LoadSongs();
-
         }
 
-        // ---------------- SONGS CSV ----------------
+        // ---------------- SONGS ----------------
         public static void SaveSongs()
         {
             try
             {
                 using (var writer = new StreamWriter(SongsFilePath))
                 {
-                    // header
                     writer.WriteLine("Title,AssignedEditor,Message,Review,Grade");
                     foreach (var s in Songs)
                     {
@@ -48,7 +47,6 @@ namespace MyFirstWpfApp
 
             if (!File.Exists(SongsFilePath))
             {
-                // default songs
                 Songs.Add(new Song { Title = "Song A" });
                 Songs.Add(new Song { Title = "Song B" });
                 Songs.Add(new Song { Title = "Song C" });
@@ -62,8 +60,7 @@ namespace MyFirstWpfApp
                 if (parts.Length >= 5)
                 {
                     int? grade = null;
-                    if (int.TryParse(parts[4], out int g))
-                        grade = g;
+                    if (int.TryParse(parts[4], out int g)) grade = g;
 
                     Songs.Add(new Song
                     {
@@ -77,62 +74,54 @@ namespace MyFirstWpfApp
             }
         }
 
-        private static string GetUserPlaylistNameFile(string userEmail)
-        {
-            // replace '@' and '.' to make a safe file name
-            string safeEmail = userEmail.Replace("@", "_at_").Replace(".", "_");
-            return $"playlist_name_{safeEmail}.txt";
-        }
-
-        public static void SavePlaylistName(string userEmail, string name)
-        {
-            File.WriteAllText(GetUserPlaylistNameFile(userEmail), name);
-        }
-
-        public static string LoadPlaylistName(string userEmail)
-        {
-            string file = GetUserPlaylistNameFile(userEmail);
-            if (File.Exists(file))
-                return File.ReadAllText(file);
-            return "My Playlist"; // default
-        }
-
-        // ---------------- USER PLAYLIST CSV ----------------
-        public static void SaveUserPlaylist(string userEmail, IEnumerable<Song> playlist)
+        // ---------------- USER PLAYLISTS ----------------
+        // Dictionary: userEmail -> (playlistName -> list of songs)
+        public static void SaveUserPlaylists(string userEmail, Dictionary<string, ObservableCollection<Song>> playlists)
         {
             var existingLines = new List<string>();
-            if (File.Exists(PlaylistFilePath))
-                existingLines = File.ReadAllLines(PlaylistFilePath).Where(l => !l.StartsWith(userEmail + ",")).ToList();
+            if (File.Exists(UserPlaylistsFilePath))
+                existingLines = File.ReadAllLines(UserPlaylistsFilePath)
+                                    .Where(l => !l.StartsWith(userEmail + ",")).ToList();
 
-            using (var writer = new StreamWriter(PlaylistFilePath))
+            using (var writer = new StreamWriter(UserPlaylistsFilePath))
             {
-                // write other users' data
+                // write other users
                 foreach (var line in existingLines)
                     writer.WriteLine(line);
 
-                // write current user's playlist
-                foreach (var song in playlist)
-                    writer.WriteLine($"{userEmail},{EscapeCsv(song.Title)}");
+                // write current user's playlists
+                foreach (var kvp in playlists)
+                {
+                    string playlistName = EscapeCsv(kvp.Key);
+                    foreach (var song in kvp.Value)
+                        writer.WriteLine($"{userEmail},{playlistName},{EscapeCsv(song.Title)}");
+                }
             }
         }
 
-        public static List<Song> LoadUserPlaylist(string userEmail)
+        public static Dictionary<string, ObservableCollection<Song>> LoadUserPlaylists(string userEmail)
         {
-            var result = new List<Song>();
-            if (!File.Exists(PlaylistFilePath))
-                return result;
+            var result = new Dictionary<string, ObservableCollection<Song>>();
+            if (!File.Exists(UserPlaylistsFilePath)) return result;
 
-            var lines = File.ReadAllLines(PlaylistFilePath);
+            var lines = File.ReadAllLines(UserPlaylistsFilePath);
             foreach (var line in lines)
             {
                 var parts = line.Split(',');
-                if (parts.Length >= 2 && parts[0] == userEmail)
+                if (parts.Length >= 3 && parts[0] == userEmail)
                 {
-                    var song = Songs.FirstOrDefault(s => s.Title == parts[1]);
+                    string playlistName = parts[1];
+                    string songTitle = parts[2];
+
+                    if (!result.ContainsKey(playlistName))
+                        result[playlistName] = new ObservableCollection<Song>();
+
+                    var song = Songs.FirstOrDefault(s => s.Title == songTitle);
                     if (song != null)
-                        result.Add(song);
+                        result[playlistName].Add(song);
                 }
             }
+
             return result;
         }
 
@@ -156,24 +145,16 @@ namespace MyFirstWpfApp
 
             foreach (char c in line)
             {
-                if (c == '"' && !inQuotes)
-                {
-                    inQuotes = true;
-                }
-                else if (c == '"' && inQuotes)
-                {
-                    inQuotes = false;
-                }
+                if (c == '"' && !inQuotes) inQuotes = true;
+                else if (c == '"' && inQuotes) inQuotes = false;
                 else if (c == ',' && !inQuotes)
                 {
                     result.Add(current.ToString());
                     current.Clear();
                 }
-                else
-                {
-                    current.Append(c);
-                }
+                else current.Append(c);
             }
+
             result.Add(current.ToString());
             return result.ToArray();
         }
