@@ -60,6 +60,14 @@ namespace MyFirstWpfApp
                 this.Close();
             }
 
+            else if (email == "disco.user@gmail.com" && password == "disco")
+            {
+                MessageBox.Show("Login as disco.user successful!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                UserWindow userWindow = new UserWindow(email);
+                userWindow.Show();
+                this.Close();
+            }
+
             else
             {
                 MessageBox.Show("Invalid email or password.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);

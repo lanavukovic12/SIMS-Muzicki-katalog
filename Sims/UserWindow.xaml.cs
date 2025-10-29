@@ -15,13 +15,16 @@ namespace MyFirstWpfApp
             InitializeComponent();
             UserEmail = email;
 
-            // učitavanje svih pesama
+            // load all songs
             AllSongsList.ItemsSource = DataStore.Songs;
-            // učitavanje plejlisti korisnika
+
+            // load user's playlist
             var loadedSongs = DataStore.LoadUserPlaylist(UserEmail);
             Playlist = new ObservableCollection<Song>(loadedSongs);
             PlaylistList.ItemsSource = Playlist;
-            PlaylistName = DataStore.LoadPlaylistName();
+
+            // load per-user playlist name
+            PlaylistName = DataStore.LoadPlaylistName(UserEmail);
             PlaylistNameBox.Text = PlaylistName;
         }
 
@@ -52,7 +55,6 @@ namespace MyFirstWpfApp
         private void RenamePlaylist_Click(object sender, RoutedEventArgs e)
         {
             string newName = PlaylistNameBox.Text.Trim();
-
             if (string.IsNullOrEmpty(newName))
             {
                 MessageBox.Show("Playlist name cannot be empty.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -62,8 +64,8 @@ namespace MyFirstWpfApp
             PlaylistName = newName;
             MessageBox.Show($"Playlist renamed to \"{PlaylistName}\"!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
 
-            // Optional: save name to a file so it stays after restart
-            DataStore.SavePlaylistName(PlaylistName);
+            // save per-user playlist name
+            DataStore.SavePlaylistName(UserEmail, PlaylistName);
         }
 
         private void Logout_Click(object sender, RoutedEventArgs e)

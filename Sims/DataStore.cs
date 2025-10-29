@@ -9,7 +9,6 @@ namespace MyFirstWpfApp
     {
         private static readonly string SongsFilePath = "songs.csv";
         private static readonly string PlaylistFilePath = "user_playlist.csv";
-        private static string PlaylistNameFile = "playlist_name.txt";
 
         public static ObservableCollection<Song> Songs { get; set; } = new ObservableCollection<Song>();
 
@@ -77,15 +76,25 @@ namespace MyFirstWpfApp
                 }
             }
         }
-        public static void SavePlaylistName(string name)
+
+        private static string GetUserPlaylistNameFile(string userEmail)
         {
-            File.WriteAllText(PlaylistNameFile, name);
+            // replace '@' and '.' to make a safe file name
+            string safeEmail = userEmail.Replace("@", "_at_").Replace(".", "_");
+            return $"playlist_name_{safeEmail}.txt";
         }
-        public static string LoadPlaylistName()
+
+        public static void SavePlaylistName(string userEmail, string name)
         {
-            if (File.Exists(PlaylistNameFile))
-                return File.ReadAllText(PlaylistNameFile);
-            return "My Playlist";
+            File.WriteAllText(GetUserPlaylistNameFile(userEmail), name);
+        }
+
+        public static string LoadPlaylistName(string userEmail)
+        {
+            string file = GetUserPlaylistNameFile(userEmail);
+            if (File.Exists(file))
+                return File.ReadAllText(file);
+            return "My Playlist"; // default
         }
 
         // ---------------- USER PLAYLIST CSV ----------------
