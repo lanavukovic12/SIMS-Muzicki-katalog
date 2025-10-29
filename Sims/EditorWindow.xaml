@@ -1,0 +1,41 @@
+﻿<Window x:Class="MyFirstWpfApp.EditorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Editor Panel" Height="450" Width="700"
+        WindowStartupLocation="CenterScreen">
+    <Grid Margin="12">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="3*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Left: Assigned songs -->
+        <StackPanel Grid.Column="0" Margin="0,0,10,0">
+            <TextBlock Text="Assigned Songs" FontSize="16" FontWeight="Bold" Margin="0,0,0,8"/>
+            <ListBox x:Name="SongsList"
+                     Height="320"
+                     DisplayMemberPath="Title"
+                     SelectionMode="Single"
+                     SelectionChanged="SongsList_SelectionChanged"/>
+        </StackPanel>
+
+        <!-- Right: Review area -->
+        <StackPanel Grid.Column="1">
+            <TextBlock Text="Review" FontSize="16" FontWeight="Bold" Margin="0,0,0,8"/>
+
+            <TextBlock Text="Selected song:" FontWeight="SemiBold"/>
+            <TextBlock x:Name="SelectedSongTitle" Text="(none)" Margin="0,0,0,8"/>
+
+            <TextBlock Text="Grade (1-5):" Margin="0,6,0,2"/>
+            <TextBox x:Name="GradeBox" Width="120" Height="28" Margin="0,0,0,8"/>
+
+            <TextBlock Text="Comment:" Margin="0,6,0,2"/>
+            <TextBox x:Name="ReviewBox" Height="150" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"/>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,12,0,0">
+                <Button Content="Publish Review" Width="120" Height="34" Click="PublishReview_Click" />
+                <Button Content="Logout" Width="80" Height="34" Margin="12,0,0,0" Click="Logout_Click"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>
