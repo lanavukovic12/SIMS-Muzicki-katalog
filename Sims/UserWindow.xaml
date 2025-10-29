@@ -25,9 +25,19 @@
 
         <!-- Playlist -->
         <StackPanel Grid.Column="2">
-            <TextBlock Text="My Playlist" FontWeight="Bold" FontSize="16" Margin="0,0,0,5"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <TextBox x:Name="PlaylistNameBox"
+                         Text="My Playlist"
+                         Width="134"
+                         Margin="0,0,10,0"/>
+                <Button Content="Rename"
+                        Width="80"
+                        Click="RenamePlaylist_Click"/>
+            </StackPanel>
             <ListBox x:Name="PlaylistList" Height="300" DisplayMemberPath="Title" SelectionMode="Extended"/>
         </StackPanel>
+        
+    
 
         <!-- Logout -->
         <Button Content="Logout" Width="80" Height="30" HorizontalAlignment="Center"

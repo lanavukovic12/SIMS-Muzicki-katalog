@@ -9,12 +9,14 @@ namespace MyFirstWpfApp
     {
         private static readonly string SongsFilePath = "songs.csv";
         private static readonly string PlaylistFilePath = "user_playlist.csv";
+        private static string PlaylistNameFile = "playlist_name.txt";
 
         public static ObservableCollection<Song> Songs { get; set; } = new ObservableCollection<Song>();
 
         static DataStore()
         {
             LoadSongs();
+
         }
 
         // ---------------- SONGS CSV ----------------
@@ -74,6 +76,16 @@ namespace MyFirstWpfApp
                     });
                 }
             }
+        }
+        public static void SavePlaylistName(string name)
+        {
+            File.WriteAllText(PlaylistNameFile, name);
+        }
+        public static string LoadPlaylistName()
+        {
+            if (File.Exists(PlaylistNameFile))
+                return File.ReadAllText(PlaylistNameFile);
+            return "My Playlist";
         }
 
         // ---------------- USER PLAYLIST CSV ----------------

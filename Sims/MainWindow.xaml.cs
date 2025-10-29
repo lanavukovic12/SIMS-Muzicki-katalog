@@ -36,15 +36,29 @@ namespace MyFirstWpfApp
                 editorWindow.Show();
                 this.Close();
             }
+            else if (email == "music.editor@gmail.com" && password == "music")
+            {
+                MessageBox.Show("Login as music.editor successful!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                EditorWindow editorWindow = new EditorWindow(email);
+                editorWindow.Show();
+                this.Close();
+            }
 
             else if (email == "user@gmail.com" && password == "user")
             {
                 MessageBox.Show("Login as user successful!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                UserWindow userWindow = new UserWindow(email); // prosledi email
+                UserWindow userWindow = new UserWindow(email);
                 userWindow.Show();
                 this.Close();
             }
 
+            else if (email == "user2@gmail.com" && password == "user2")
+            {
+                MessageBox.Show("Login as user2 successful!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                UserWindow userWindow = new UserWindow(email);
+                userWindow.Show();
+                this.Close();
+            }
 
             else
             {
