@@ -12,6 +12,12 @@ namespace MyFirstWpfApp
         private static readonly string UserPlaylistsFilePath = "user_playlists.csv";
 
         public static ObservableCollection<Song> Songs { get; set; } = new ObservableCollection<Song>();
+        public static List<string> Editors = new List<string>
+        {
+            "editor@gmail.com",
+            "editor2@gmail.com",
+            "music.editor@gmail.com"
+        };
 
         static DataStore()
         {

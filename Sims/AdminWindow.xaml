@@ -11,7 +11,7 @@
         </Grid.RowDefinitions>
 
         <!-- Song list -->
-        <ListBox x:Name="SongsList" DisplayMemberPath="Title" SelectionMode="Single"/>
+        <ListBox x:Name="SongsList" DisplayMemberPath="Title" SelectionMode="Single" SelectionChanged="SongsList_SelectionChanged"/>
 
         <!-- Assign controls -->
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
