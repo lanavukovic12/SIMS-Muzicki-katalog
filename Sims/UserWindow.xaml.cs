@@ -130,6 +130,35 @@ namespace MyFirstWpfApp
             DataStore.SaveUserPlaylists(UserEmail, UserPlaylists);
         }
 
+        private void DeletePlaylist_Click(object sender, RoutedEventArgs e)
+        {
+            if (CurrentPlaylistName == null) return;
+
+            // Prevent deleting the last playlist
+            if (UserPlaylists.Count <= 1)
+            {
+                MessageBox.Show("You must have at least one playlist.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var result = MessageBox.Show($"Are you sure you want to delete the playlist \"{CurrentPlaylistName}\"?",
+                "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result != MessageBoxResult.Yes) return;
+
+            // Remove playlist
+            UserPlaylists.Remove(CurrentPlaylistName);
+
+            // Select another playlist (first one)
+            CurrentPlaylistName = UserPlaylists.Keys.First();
+            PlaylistSelector.ItemsSource = null;
+            PlaylistSelector.ItemsSource = UserPlaylists.Keys;
+            PlaylistSelector.SelectedItem = CurrentPlaylistName;
+            PlaylistList.ItemsSource = UserPlaylists[CurrentPlaylistName];
+            PlaylistNameBox.Text = CurrentPlaylistName;
+
+            DataStore.SaveUserPlaylists(UserEmail, UserPlaylists);
+        }
+
         private void Logout_Click(object sender, RoutedEventArgs e)
         {
             MainWindow mainWindow = new MainWindow();
