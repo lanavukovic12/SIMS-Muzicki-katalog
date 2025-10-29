@@ -33,7 +33,7 @@
             <TextBox x:Name="ReviewBox" Height="150" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"/>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,12,0,0">
-                <Button Content="Publish Review" Width="120" Height="34" Click="PublishReview_Click" />
+                <Button x:Name="PublishReviewButton" Content="Publish Review" Width="120" Height="34" Click="PublishReview_Click" />
                 <Button Content="Logout" Width="80" Height="34" Margin="12,0,0,0" Click="Logout_Click"/>
             </StackPanel>
         </StackPanel>

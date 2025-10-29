@@ -19,7 +19,7 @@ namespace MyFirstWpfApp
 
         private void LoadAssignedSongs()
         {
-            // Load all songs assigned to this editor, regardless of whether they have been graded
+            // Load all songs assigned to this editor
             var songs = DataStore.Songs
                 .Where(s => string.Equals(s.AssignedEditor, EditorEmail, StringComparison.OrdinalIgnoreCase))
                 .ToList();
@@ -27,12 +27,22 @@ namespace MyFirstWpfApp
             AssignedSongsList = new ObservableCollection<Song>(songs);
             SongsList.ItemsSource = AssignedSongsList;
 
+            // Minimal change: gray out reviewed songs
+            SongsList.Dispatcher.InvokeAsync(() =>
+            {
+                foreach (var item in SongsList.Items)
+                {
+                    var lbi = SongsList.ItemContainerGenerator.ContainerFromItem(item) as System.Windows.Controls.ListBoxItem;
+                    if (lbi != null && (item as Song)?.Grade != null)
+                        lbi.Foreground = System.Windows.Media.Brushes.Gray;
+                }
+            });
+
             // Reset UI
             SelectedSongTitle.Text = "(none)";
             GradeBox.Text = "";
             ReviewBox.Text = "";
         }
-
 
         private void SongsList_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
@@ -42,12 +52,17 @@ namespace MyFirstWpfApp
                 SelectedSongTitle.Text = song.Title;
                 GradeBox.Text = song.Grade?.ToString() ?? "";
                 ReviewBox.Text = song.Review ?? "";
+
+                // Disable Publish button if song already has a grade
+                PublishReviewButton.IsEnabled = song.Grade == null;
             }
             else
             {
                 SelectedSongTitle.Text = "(none)";
                 GradeBox.Text = "";
                 ReviewBox.Text = "";
+                ReviewBox.Text = "";
+                PublishReviewButton.IsEnabled = false;
             }
         }
 
@@ -72,31 +87,35 @@ namespace MyFirstWpfApp
                 return;
             }
 
-            // optionally validate range
             if (grade < 1 || grade > 5)
             {
                 MessageBox.Show("Grade must be between 1 and 5.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            // update model (DataStore.Songs sadrzi iste objekte po referenci)
+            // NEW: require comment as well
+            if (string.IsNullOrWhiteSpace(ReviewBox.Text))
+            {
+                MessageBox.Show("Please enter a comment.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            // update model
             selectedSong.Grade = grade;
             selectedSong.Review = ReviewBox.Text.Trim();
 
-            // sacuvaj u CSV
             DataStore.SaveSongs();
 
-            // ukloni iz liste editora da se vise ne prikazuje
             AssignedSongsList.Remove(selectedSong);
 
             MessageBox.Show($"Review published for '{selectedSong.Title}'.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
 
-            // ocisti UI
             SongsList.SelectedItem = null;
             SelectedSongTitle.Text = "(none)";
             GradeBox.Text = "";
             ReviewBox.Text = "";
         }
+
 
         private void Logout_Click(object sender, RoutedEventArgs e)
         {
