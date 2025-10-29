@@ -50,16 +50,30 @@ namespace MyFirstWpfApp
                     ? File.ReadAllLines("editors.csv").ToList()
                     : new List<string> { "editor@gmail.com", "editor2@gmail.com", "music.editor@gmail.com" };
 
-                editors.Insert(0, "None"); // <-- Add this at the top
+                editors.Insert(0, "None");
                 EditorComboBox.ItemsSource = editors;
 
-                // Select the assigned editor or "None" if null/empty
                 EditorComboBox.SelectedItem = string.IsNullOrEmpty(selectedSong.AssignedEditor)
                     ? "None"
                     : selectedSong.AssignedEditor;
+
+                // Display grade and comment
+                SelectedGrade.Text = selectedSong.Grade.HasValue ? $"Grade: {selectedSong.Grade}" : "Grade: N/A";
+                SelectedComment.Text = !string.IsNullOrEmpty(selectedSong.Review) ? $"Comment: {selectedSong.Review}" : "Comment: N/A";
+
+                // Disable Assign button and ComboBox if reviewed
+                bool isReviewed = selectedSong.Grade.HasValue;
+                AssignButton.IsEnabled = !isReviewed;
+                EditorComboBox.IsEnabled = !isReviewed;
+            }
+            else
+            {
+                SelectedGrade.Text = "";
+                SelectedComment.Text = "";
+                AssignButton.IsEnabled = true;
+                EditorComboBox.IsEnabled = true;
             }
         }
-
 
         private void AssignSong_Click(object sender, RoutedEventArgs e)
         {
@@ -74,14 +88,19 @@ namespace MyFirstWpfApp
                 return;
             }
 
-            // If "None" is selected, remove the editor assignment
+            // Assign or remove editor
             selectedSong.AssignedEditor = selectedEditor == "None" ? null : selectedEditor;
 
+            // Save changes
             DataStore.SaveSongs();
+
+            // Refresh the ListBox so opacity updates immediately
+            SongsList.Items.Refresh();
 
             MessageBox.Show($"'{selectedSong.Title}' is now assigned to '{selectedSong.AssignedEditor ?? "no one"}'.",
                 "Success", MessageBoxButton.OK, MessageBoxImage.Information);
         }
+
 
 
 

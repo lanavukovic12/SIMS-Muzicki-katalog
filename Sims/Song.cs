@@ -7,6 +7,7 @@
         public string Message { get; set; }
         public string Review { get; set; }
         public int? Grade { get; set; }
+        public bool IsAssigned => !string.IsNullOrEmpty(AssignedEditor);
 
         public override string ToString()
         {
