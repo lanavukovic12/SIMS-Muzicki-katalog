@@ -40,31 +40,46 @@ namespace MyFirstWpfApp
                 });
             }
         }
-
+        private bool editorsLoaded = false;
         private void SongsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (SongsList.SelectedItem is Song selectedSong)
+            var selectedSongs = SongsList.SelectedItems.Cast<Song>().ToList();
+
+            if (!editorsLoaded)
             {
-                // Load editors
+                // Load editors once
                 var editors = File.Exists("editors.csv")
                     ? File.ReadAllLines("editors.csv").ToList()
                     : new List<string> { "editor@gmail.com", "editor2@gmail.com", "music.editor@gmail.com" };
 
-                editors.Insert(0, "None");
+                editors.Insert(0, "None"); // Add "None" at the top
                 EditorComboBox.ItemsSource = editors;
+                editorsLoaded = true;
+            }
 
-                EditorComboBox.SelectedItem = string.IsNullOrEmpty(selectedSong.AssignedEditor)
-                    ? "None"
-                    : selectedSong.AssignedEditor;
+            if (selectedSongs.Any())
+            {
+                // Show grade/comment for first selected song only
+                var firstSong = selectedSongs.First();
+                SelectedGrade.Text = firstSong.Grade.HasValue ? $"Grade: {firstSong.Grade}" : "Grade: N/A";
+                SelectedComment.Text = !string.IsNullOrEmpty(firstSong.Review) ? $"Comment: {firstSong.Review}" : "Comment: N/A";
 
-                // Display grade and comment
-                SelectedGrade.Text = selectedSong.Grade.HasValue ? $"Grade: {selectedSong.Grade}" : "Grade: N/A";
-                SelectedComment.Text = !string.IsNullOrEmpty(selectedSong.Review) ? $"Comment: {selectedSong.Review}" : "Comment: N/A";
+                // Disable assign if any song is reviewed
+                bool anyReviewed = selectedSongs.Any(s => s.Grade.HasValue || !string.IsNullOrEmpty(s.Review));
+                AssignButton.IsEnabled = !anyReviewed;
+                EditorComboBox.IsEnabled = !anyReviewed;
 
-                // Disable Assign button and ComboBox if reviewed
-                bool isReviewed = selectedSong.Grade.HasValue;
-                AssignButton.IsEnabled = !isReviewed;
-                EditorComboBox.IsEnabled = !isReviewed;
+                // Set selected editor only if exactly one song is selected
+                if (selectedSongs.Count == 1)
+                {
+                    EditorComboBox.SelectedItem = string.IsNullOrEmpty(firstSong.AssignedEditor)
+                        ? "None"
+                        : firstSong.AssignedEditor;
+                }
+                else
+                {
+                    EditorComboBox.SelectedItem = null;
+                }
             }
             else
             {
@@ -72,37 +87,33 @@ namespace MyFirstWpfApp
                 SelectedComment.Text = "";
                 AssignButton.IsEnabled = true;
                 EditorComboBox.IsEnabled = true;
+                EditorComboBox.SelectedItem = "None";
             }
         }
 
         private void AssignSong_Click(object sender, RoutedEventArgs e)
         {
-            var selectedSong = SongsList.SelectedItem as Song;
-            if (selectedSong == null) return;
+            var selectedSongs = SongsList.SelectedItems.Cast<Song>().ToList();
+            if (!selectedSongs.Any()) return;
 
             var selectedEditor = EditorComboBox.SelectedItem as string;
-
             if (string.IsNullOrEmpty(selectedEditor))
             {
                 MessageBox.Show("Please select an editor from the dropdown.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            // Assign or remove editor
-            selectedSong.AssignedEditor = selectedEditor == "None" ? null : selectedEditor;
+            foreach (var song in selectedSongs)
+            {
+                // Skip songs that have been reviewed
+                if (!string.IsNullOrEmpty(song.Review)) continue;
 
-            // Save changes
+                song.AssignedEditor = selectedEditor == "None" ? null : selectedEditor;
+            }
+
             DataStore.SaveSongs();
-
-            // Refresh the ListBox so opacity updates immediately
-            SongsList.Items.Refresh();
-
-            MessageBox.Show($"'{selectedSong.Title}' is now assigned to '{selectedSong.AssignedEditor ?? "no one"}'.",
-                "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            SongsList.Items.Refresh(); // Update opacity
         }
-
-
-
 
         private void Logout_Click(object sender, RoutedEventArgs e)
         {

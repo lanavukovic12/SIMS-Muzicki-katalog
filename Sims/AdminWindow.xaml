@@ -11,7 +11,7 @@
         </Grid.RowDefinitions>
 
         <!-- Song list -->
-        <ListBox x:Name="SongsList" DisplayMemberPath="Title" SelectionMode="Single" SelectionChanged="SongsList_SelectionChanged" Margin="0,0,152,0">
+        <ListBox x:Name="SongsList" DisplayMemberPath="Title" SelectionMode="Extended" SelectionChanged="SongsList_SelectionChanged" Margin="0,0,152,0">
             <ListBox.ItemContainerStyle>
                 <Style TargetType="ListBoxItem">
                     <Setter Property="Opacity" Value="1"/>
