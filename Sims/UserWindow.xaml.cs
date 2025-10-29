@@ -44,13 +44,25 @@ namespace MyFirstWpfApp
             var selectedSongs = AllSongsList.SelectedItems.Cast<Song>().ToList();
             var currentPlaylist = UserPlaylists[CurrentPlaylistName];
 
+            int addedCount = 0;
+
             foreach (var song in selectedSongs)
             {
                 if (!currentPlaylist.Contains(song))
+                {
                     currentPlaylist.Add(song);
+                    addedCount++;
+                }
             }
 
             DataStore.SaveUserPlaylists(UserEmail, UserPlaylists);
+
+            if (addedCount > 0)
+                MessageBox.Show($"{addedCount} song(s) added to playlist \"{CurrentPlaylistName}\".",
+                    "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            else
+                MessageBox.Show("No songs were added (they may already be in the playlist).",
+                    "Info", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void RemoveFromPlaylist_Click(object sender, RoutedEventArgs e)
@@ -58,13 +70,23 @@ namespace MyFirstWpfApp
             var selectedSongs = PlaylistList.SelectedItems.Cast<Song>().ToList();
             var currentPlaylist = UserPlaylists[CurrentPlaylistName];
 
+            int removedCount = 0;
+
             foreach (var song in selectedSongs)
             {
-                currentPlaylist.Remove(song);
+                if (currentPlaylist.Remove(song))
+                    removedCount++;
             }
 
             DataStore.SaveUserPlaylists(UserEmail, UserPlaylists);
+
+            if (removedCount > 0)
+                MessageBox.Show($"{removedCount} song(s) removed from playlist \"{CurrentPlaylistName}\".",
+                    "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            else
+                MessageBox.Show("No songs were removed.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
         }
+
 
         private void RenamePlaylist_Click(object sender, RoutedEventArgs e)
         {
