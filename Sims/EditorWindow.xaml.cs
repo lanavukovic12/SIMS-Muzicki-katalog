@@ -116,7 +116,6 @@ namespace MyFirstWpfApp
             ReviewBox.Text = "";
         }
 
-
         private void Logout_Click(object sender, RoutedEventArgs e)
         {
             DataStore.SaveSongs();

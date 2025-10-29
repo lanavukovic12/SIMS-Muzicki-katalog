@@ -6,8 +6,10 @@ using System.Windows.Controls;
 
 namespace MyFirstWpfApp
 {
+
     public partial class AdminWindow : Window
     {
+        private bool editorsLoaded = false;
         public AdminWindow()
         {
             InitializeComponent();
@@ -40,7 +42,7 @@ namespace MyFirstWpfApp
                 });
             }
         }
-        private bool editorsLoaded = false;
+
         private void SongsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var selectedSongs = SongsList.SelectedItems.Cast<Song>().ToList();
@@ -103,33 +105,42 @@ namespace MyFirstWpfApp
                 return;
             }
 
-            int assignedCount = 0;
+            var assignedTitles = new List<string>();
+            var unassignedTitles = new List<string>();
 
             foreach (var song in selectedSongs)
             {
-                // Skip songs that have been reviewed
-                if (!string.IsNullOrEmpty(song.Review) || song.Grade.HasValue) continue;
+                // Skip reviewed songs
+                if (!string.IsNullOrEmpty(song.Review)) continue;
 
-                song.AssignedEditor = selectedEditor == "None" ? null : selectedEditor;
-                assignedCount++;
+                if (selectedEditor == "None")
+                {
+                    song.AssignedEditor = null;
+                    unassignedTitles.Add(song.Title);
+                }
+                else
+                {
+                    song.AssignedEditor = selectedEditor;
+                    assignedTitles.Add(song.Title);
+                }
             }
 
             DataStore.SaveSongs();
-            SongsList.Items.Refresh(); // Update opacity
+            SongsList.Items.Refresh();
 
-            // Show confirmation message
-            if (assignedCount > 0)
-            {
-                MessageBox.Show($"{assignedCount} song(s) have been assigned to '{selectedEditor}'.",
-                    "Assignment Successful", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            else
-            {
-                MessageBox.Show("No songs were assigned. (Perhaps they were already reviewed?)",
-                    "Assignment Skipped", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
+            var messages = new List<string>();
+            if (assignedTitles.Any())
+                messages.Add($"Assigned editor '{selectedEditor}' to:\n{string.Join("\n", assignedTitles)}");
+
+            if (unassignedTitles.Any())
+                messages.Add($"Unassigned editor from:\n{string.Join("\n", unassignedTitles)}");
+
+            if (messages.Any())
+                MessageBox.Show(string.Join("\n\n", messages),
+                    "Assignment Update",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
         }
-
 
         private void Logout_Click(object sender, RoutedEventArgs e)
         {
