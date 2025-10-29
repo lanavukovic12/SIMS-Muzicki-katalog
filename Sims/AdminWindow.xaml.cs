@@ -103,17 +103,33 @@ namespace MyFirstWpfApp
                 return;
             }
 
+            int assignedCount = 0;
+
             foreach (var song in selectedSongs)
             {
                 // Skip songs that have been reviewed
-                if (!string.IsNullOrEmpty(song.Review)) continue;
+                if (!string.IsNullOrEmpty(song.Review) || song.Grade.HasValue) continue;
 
                 song.AssignedEditor = selectedEditor == "None" ? null : selectedEditor;
+                assignedCount++;
             }
 
             DataStore.SaveSongs();
             SongsList.Items.Refresh(); // Update opacity
+
+            // Show confirmation message
+            if (assignedCount > 0)
+            {
+                MessageBox.Show($"{assignedCount} song(s) have been assigned to '{selectedEditor}'.",
+                    "Assignment Successful", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                MessageBox.Show("No songs were assigned. (Perhaps they were already reviewed?)",
+                    "Assignment Skipped", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
         }
+
 
         private void Logout_Click(object sender, RoutedEventArgs e)
         {
