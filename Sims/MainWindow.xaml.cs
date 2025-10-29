@@ -1,5 +1,6 @@
 ﻿using Sims;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace MyFirstWpfApp
 {
@@ -8,6 +9,15 @@ namespace MyFirstWpfApp
         public MainWindow()
         {
             InitializeComponent();
+            Loaded += (s, e) => EmailBox.Focus();
+            EmailBox.KeyDown += (s, e) =>
+            {
+                if (e.Key == System.Windows.Input.Key.Enter) PasswordBox.Focus();
+            };
+            PasswordBox.KeyDown += (s, e) =>
+            {
+                if (e.Key == System.Windows.Input.Key.Enter) LoginButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            };
         }
 
         private void LoginButton_Click(object sender, RoutedEventArgs e)

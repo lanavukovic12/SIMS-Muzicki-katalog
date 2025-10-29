@@ -38,7 +38,8 @@
         </StackPanel>
 
         <!-- Login Button -->
-        <Button Grid.Row="2"
+        <Button x:Name="LoginButton" 
+                Grid.Row="2"
                 Content="Login"
                 Height="35"
                 Margin="0,20,0,0"
