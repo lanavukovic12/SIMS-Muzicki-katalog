@@ -20,8 +20,6 @@ namespace MyFirstWpfApp
             InitializeComponent();
             UserEmail = email;
 
-            AllSongsList.ItemsSource = DataStore.Songs;
-
             // Load all playlists for user
             UserPlaylists = DataStore.LoadUserPlaylists(UserEmail);
 
@@ -37,6 +35,17 @@ namespace MyFirstWpfApp
             PlaylistSelector.SelectedItem = CurrentPlaylistName;
             PlaylistList.ItemsSource = UserPlaylists[CurrentPlaylistName];
             PlaylistNameBox.Text = CurrentPlaylistName;
+
+            RefreshAllSongsList();
+        }
+
+        private void RefreshAllSongsList()
+        {
+            // Show only songs that are NOT in the current playlist
+            var currentPlaylist = UserPlaylists[CurrentPlaylistName];
+            AllSongsList.ItemsSource = DataStore.Songs
+                .Where(song => !currentPlaylist.Contains(song))
+                .ToList();
         }
 
         private void AddToPlaylist_Click(object sender, RoutedEventArgs e)
@@ -56,6 +65,7 @@ namespace MyFirstWpfApp
             }
 
             DataStore.SaveUserPlaylists(UserEmail, UserPlaylists);
+            RefreshAllSongsList();
 
             if (addedSongs.Any())
                 MessageBox.Show($"Added {addedSongs.Count} song(s) to playlist \"{CurrentPlaylistName}\":\n- {string.Join("\n- ", addedSongs)}",
@@ -79,6 +89,7 @@ namespace MyFirstWpfApp
             }
 
             DataStore.SaveUserPlaylists(UserEmail, UserPlaylists);
+            RefreshAllSongsList();
 
             if (removedSongs.Any())
                 MessageBox.Show($"Removed {removedSongs.Count} song(s) from playlist \"{CurrentPlaylistName}\":\n- {string.Join("\n- ", removedSongs)}",
@@ -125,6 +136,7 @@ namespace MyFirstWpfApp
 
             CurrentPlaylistName = PlaylistSelector.SelectedItem.ToString();
             PlaylistList.ItemsSource = UserPlaylists[CurrentPlaylistName];
+            RefreshAllSongsList();
             PlaylistNameBox.Text = CurrentPlaylistName;
         }
 
