@@ -1,4 +1,4 @@
-﻿<Window x:Class="MyFirstWpfApp.EditorWindow"
+﻿<Window x:Class="Sims.EditorWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Editor Panel" Height="450" Width="700"

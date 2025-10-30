@@ -1,4 +1,4 @@
-﻿namespace MyFirstWpfApp
+﻿namespace Sims
 {
     public class Song
     {

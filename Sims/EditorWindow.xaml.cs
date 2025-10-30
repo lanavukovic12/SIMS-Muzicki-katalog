@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 
-namespace MyFirstWpfApp
+namespace Sims
 {
     public partial class EditorWindow : Window
     {
@@ -93,7 +93,7 @@ namespace MyFirstWpfApp
                 return;
             }
 
-            // NEW: require comment as well
+            // require comment as well
             if (string.IsNullOrWhiteSpace(ReviewBox.Text))
             {
                 MessageBox.Show("Please enter a comment.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);

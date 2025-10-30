@@ -4,7 +4,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace MyFirstWpfApp
+namespace Sims
 {
 
     public partial class AdminWindow : Window
@@ -17,7 +17,7 @@ namespace MyFirstWpfApp
             // Bind the song list to DataStore
             SongsList.ItemsSource = DataStore.Songs;
 
-            // 🧠 Load editors from a file (editors.csv)
+            // Load editors from a file (editors.csv)
             if (File.Exists("editors.csv"))
             {
                 // Each line in editors.csv is one editor email

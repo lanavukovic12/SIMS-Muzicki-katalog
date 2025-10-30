@@ -1,4 +1,4 @@
-﻿<Window x:Class="MyFirstWpfApp.UserWindow"
+﻿<Window x:Class="Sims.UserWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="User Panel" Height="617" Width="1197"

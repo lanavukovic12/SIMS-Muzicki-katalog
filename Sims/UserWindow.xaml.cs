@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 
-namespace MyFirstWpfApp
+namespace Sims
 {
     public partial class UserWindow : Window
     {
